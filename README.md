@@ -10,6 +10,7 @@ Python3 code to display current and near-term weather conditions as well as an a
 - `pip3 install -r requirements.txt`
 
 ## Tips
+- Make sure your raspi is on the right timezone!!
 - On your own system you may need to adjust the loction of the resource files (the fonts and icons, depending on where you put them). I found that I needed absolute links n the code to make it work properly.
 - I suggest creating a cron job that refreshes the screen every 15 minutes with new data. This is a lot simpler than it sounds, check [here](https://www.ostechnix.com/a-beginners-guide-to-cron-jobs/) for guidance. I did not see any benefit to more frequent requests.
 
