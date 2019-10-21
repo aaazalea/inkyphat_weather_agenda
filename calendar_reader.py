@@ -37,7 +37,7 @@ def get_events():
     now = datetime.datetime.now()
     now -= datetime.timedelta(hours=4)
     now_str = now.replace(hour=8, minute=0, second=0, microsecond=0).isoformat() + 'Z' # 'Z' indicates UTC time
-    print('Getting the upcoming 10 events')
+    print('Getting data from google calendar...')
     # Call the Calendar API
     events_result = service.events().list(calendarId='primary', timeMin=now_str,
                                         maxResults=10, singleEvents=True,

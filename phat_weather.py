@@ -4,7 +4,7 @@
 
 import glob
 print("Initializing inky...")
-# from inky import InkyPHAT
+from inky import InkyPHAT
 print("Initializing PIL...")
 from PIL import Image, ImageFont, ImageDraw
 import datetime
@@ -13,6 +13,7 @@ from darksky import forecast
 import textwrap
 print("Initializing matplotlib...")
 from matplotlib import pyplot as plt
+print("Other init...")
 from math import ceil, floor
 import secrets
 import calendar_reader
@@ -30,6 +31,7 @@ UNITS = 'us' #specify the units you want your results in here, see the Dark Sky 
 APIKEY= secrets.darksky_apikey # put your Dark Sky API key here. Get one at https://darksky.net/dev
 calendar_agenda = calendar_reader.get_events()
 # Get data from DarkSky
+print("Weather forecast...")
 with forecast(APIKEY, *LOCATION, units=UNITS) as location:
     # print(location)
     # today
