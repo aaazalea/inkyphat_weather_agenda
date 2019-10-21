@@ -15,7 +15,8 @@ Python3 code to display current and near-term weather conditions as well as an a
 - I suggest creating a cron job that refreshes the screen every 15 minutes with new data. This is a lot simpler than it sounds, check [here](https://www.ostechnix.com/a-beginners-guide-to-cron-jobs/) for guidance. I did not see any benefit to more frequent requests.
 
 ## Example
-![Image](inky-pHAT.png)
+Better picture coming...
+![Image](picture.jpg)
 
 ## License
 

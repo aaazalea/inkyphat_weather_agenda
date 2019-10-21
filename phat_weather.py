@@ -51,7 +51,7 @@ with forecast(APIKEY, *LOCATION, units=UNITS) as location:
     hourly_times = [datetime.datetime.fromtimestamp(fc.time) for fc in location.hourly.data[:16]]
     hourly_temps = [fc.temperature for fc in location.hourly.data[:16]]
     hourly_precip = [fc.precipProbability for fc in location.hourly.data[:16]]
-
+print("Drawing...")
 # print(hourly_first_time, hourly_temps, hourly_precip)
 min_temp = 5 * floor(min(hourly_temps) / 5.)
 max_temp = 5 * ceil(max(hourly_temps) / 5.)
@@ -154,12 +154,12 @@ for icon in glob.glob('weather-icons/icon-*.png'):
     icons[icon_name] = icon_image
 
 # Draw the current weather icon top in top right
-print(f'Icon is {iconDesc}, icons are {icons}')
+# print(f'Icon is {iconDesc}, icons are {icons}')
 if iconDesc is not None:
     img.paste(icons[iconDesc], (49, 1))        
 else:
     draw.text((49, 1), '?', YELLOW, dayFont)
-
+print("Displaying...")
 img.save("preview.png","PNG")
 # set up the image to push it
 inky_display.set_image(img)
