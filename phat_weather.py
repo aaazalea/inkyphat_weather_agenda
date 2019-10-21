@@ -3,12 +3,15 @@
 # for the Dark Sky API https://github.com/lukaskubis/darkskylib 
 
 import glob
-from inky import InkyPHAT
+print("Initializing inky...")
+# from inky import InkyPHAT
+print("Initializing PIL...")
 from PIL import Image, ImageFont, ImageDraw
 import datetime
 from datetime import date, timedelta
 from darksky import forecast
 import textwrap
+print("Initializing matplotlib...")
 from matplotlib import pyplot as plt
 from math import ceil, floor
 import secrets
@@ -51,8 +54,8 @@ with forecast(APIKEY, *LOCATION, units=UNITS) as location:
 min_temp = 5 * floor(min(hourly_temps) / 5.)
 max_temp = 5 * ceil(max(hourly_temps) / 5.)
 adjusted_temps = [(t - min_temp) / (max_temp - min_temp) for t in hourly_temps]
-plt.plot(range(16),adjusted_temps, 'r')
-plt.plot(range(16),hourly_precip, 'k')
+plt.plot(range(16),adjusted_temps, 'r', linewidth=11)
+plt.plot(range(16),hourly_precip, 'k', linewidth=11)
 plt.axis('off')
 plt.ylim((-0.02,1.02))
 plt.savefig('weather.png', bbox_inches="tight")
@@ -84,7 +87,7 @@ day_Name = date.strftime(weekday, '%a %-d')
 weekday2 = datetime.date.today() + datetime.timedelta(days=1)
 day2 = date.strftime(weekday2, '%A')
 
-draw.line((116,0,116,200),BLACK,1)
+draw.line((117,0,117,200),BLACK,1)
 
 draw.text((3, 3), day_Name, BLACK, dateFont)
 
@@ -153,12 +156,11 @@ print(f'Icon is {iconDesc}, icons are {icons}')
 if iconDesc is not None:
     img.paste(icons[iconDesc], (49, 1))        
 else:
-    draw.text((140, 10), '?', YELLOW, dayFont)
+    draw.text((49, 1), '?', YELLOW, dayFont)
 
 img.save("preview.png","PNG")
-# # set up the image to push it
+# set up the image to push it
 inky_display.set_image(img)
-inky_display.set_border(inky_display.YELLOW)
 
 # push it all to the screen
 inky_display.show()
