@@ -1,0 +1,8 @@
+.vscode/
+__pycache__/
+credentials.json
+secrets.py
+token.pickle
+venv/
+weather.png
+preview.png
