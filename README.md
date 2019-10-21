@@ -5,8 +5,8 @@ Python3 code to display current and near-term weather conditions as well as an a
 - This is based on https://github.com/ldritsas/inkyphat_weather
 
 ## Dependencies and requirements
-- You will need to get an API key from Dark Sky and know your longitude and latitude
-- You will need API info from google calendar
+- You will need to get an API key from Dark Sky and know your longitude and latitude (`secrets.py`)
+- You will need API info from google calendar (`credentials.json`)
 - `pip3 install -r requirements.txt`
 
 ## Tips
