@@ -1,10 +1,12 @@
 # a programme to display today's weather and tomorrow
 # on the inky_display using Lukas Kubis's Python wrapper
 # for the Dark Sky API https://github.com/lukaskubis/darkskylib 
+pi = True
 
 import glob
-print("Initializing inky...")
-from inky import InkyPHAT
+if pi:
+    print("Initializing inky...")
+    from inky import InkyPHAT
 print("Initializing PIL...")
 from PIL import Image, ImageFont, ImageDraw
 import datetime
@@ -18,10 +20,10 @@ from math import ceil, floor
 import secrets
 import calendar_reader
 # set the colour of the phat: black, red or yellow
-inky_display = InkyPHAT('yellow')
-BLACK = inky_display.BLACK
-YELLOW = inky_display.YELLOW
-WIDTH = inky_display.WIDTH
+inky_display = InkyPHAT('yellow') if pi else None
+BLACK = inky_display.BLACK if pi else (0,0,0)
+YELLOW = inky_display.YELLOW if pi else (200,150,0)
+WIDTH = inky_display.WIDTH if pi else 212
 
 # set lat/long for location
 LOCATION = (40.650002, -73.949997) #put your longitude and latittude here in decimal degrees
@@ -97,7 +99,11 @@ draw.text((3, 3), day_Name, BLACK, dateFont)
 # draw the current summary and conditions on the left side of the screen
 # draw.text((3, 60), currentCondFormatted, BLACK, smallFont)
 weather_image.thumbnail((100,120))
-
+weather_image = weather_image.convert("P", colors=3)
+lut = [0]*256
+lut[1] = 2
+lut[2] = 1
+weather_image = weather_image.point(lut)
 img.paste(weather_image, (8,20))
 for pct in (0,25,50,75,100):
     st = f'{pct}%'
@@ -155,14 +161,17 @@ for icon in glob.glob('weather-icons/icon-*.png'):
 
 # Draw the current weather icon top in top right
 # print(f'Icon is {iconDesc}, icons are {icons}')
-if iconDesc is not None:
+if iconDesc is not None and iconDesc in icons:
     img.paste(icons[iconDesc], (49, 1))        
 else:
     draw.text((49, 1), '?', YELLOW, dayFont)
+    print("Unknown icon: ",iconDesc)
 print("Displaying...")
 img.save("preview.png","PNG")
 # set up the image to push it
-inky_display.set_image(img)
+img.show()
+if pi:
+    inky_display.set_image(img)
 
-# push it all to the screen
-inky_display.show()
+    # push it all to the screen
+    inky_display.show()
