@@ -1,7 +1,7 @@
 # a programme to display today's weather and tomorrow
 # on the inky_display using Lukas Kubis's Python wrapper
 # for the Dark Sky API https://github.com/lukaskubis/darkskylib 
-pi = True
+pi = False
 
 import glob
 if pi:
@@ -99,10 +99,12 @@ draw.text((3, 3), day_Name, BLACK, dateFont)
 # draw the current summary and conditions on the left side of the screen
 # draw.text((3, 60), currentCondFormatted, BLACK, smallFont)
 weather_image.thumbnail((100,120))
+weather_image.putpixel((0,0),(255,0,0,255))
 weather_image = weather_image.convert("P", colors=3)
 lut = [0]*256
 lut[1] = 2
 lut[2] = 1
+weather_image.putpixel((0,0),0)
 weather_image = weather_image.point(lut)
 img.paste(weather_image, (8,20))
 for pct in (0,25,50,75,100):
