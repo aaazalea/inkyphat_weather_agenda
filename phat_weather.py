@@ -132,7 +132,7 @@ for idx in range(0,16,3):
     st = str(timestamp)
     pct = idx / 15.
     hpos = 12 + 104 * pct + 3*(len(st) == 1)
-    vpos = 104
+    vpos = 112
     draw.text((hpos,vpos), st, BLACK, smallFont)
 
 
@@ -145,11 +145,11 @@ draw.text((80, -2), temp, BLACK, tempFont)
 draw.text((150,0),"Agenda",BLACK,dateFont)
 curr_height = 20
 for time,event in calendar_agenda:
-    newX = 143
+    newX = 153
     width = 17
     if time:
-        draw.text((138 + 5 * (5-len(time)),curr_height),time,YELLOW,smallFont)
-        newX = 166
+        draw.text((143 + 5 * (5-len(time)),curr_height),time,YELLOW,smallFont)
+        newX = 172
         width = 13
     formattedEvent = textwrap.fill(event, width, break_long_words=True,max_lines=2)
     lines = formattedEvent.count('\n') + 1
