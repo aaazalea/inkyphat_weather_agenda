@@ -1,12 +1,17 @@
+#!/usr/bin/env python3
 # a programme to display today's weather and tomorrow
+
 # on the inky_display using Lukas Kubis's Python wrapper
 # for the Dark Sky API https://github.com/lukaskubis/darkskylib 
-pi = False
+pi = True
 
 import glob
+inky_display = None
 if pi:
     print("Initializing inky...")
-    from inky import InkyPHAT
+    from inky import auto
+    inky_display = auto()#InkyPHAT("yellow")
+
 print("Initializing PIL...")
 from PIL import Image, ImageFont, ImageDraw
 import datetime
@@ -15,15 +20,17 @@ from darksky import forecast
 import textwrap
 print("Initializing matplotlib...")
 from matplotlib import pyplot as plt
+print('init numpy')
+import numpy as np
 print("Other init...")
 from math import ceil, floor
 import secrets
 import calendar_reader
 # set the colour of the phat: black, red or yellow
-inky_display = InkyPHAT('yellow') if pi else None
 BLACK = inky_display.BLACK if pi else (0,0,0)
 YELLOW = inky_display.YELLOW if pi else (200,150,0)
 WIDTH = inky_display.WIDTH if pi else 212
+inky_display.set_border(BLACK)
 
 # set lat/long for location
 LOCATION = (40.650002, -73.949997) #put your longitude and latittude here in decimal degrees
@@ -58,8 +65,8 @@ print("Drawing...")
 min_temp = 5 * floor(min(hourly_temps) / 5.)
 max_temp = 5 * ceil(max(hourly_temps) / 5.)
 adjusted_temps = [(t - min_temp) / (max_temp - min_temp) for t in hourly_temps]
-plt.plot(range(16),adjusted_temps, 'r', linewidth=11)
 plt.plot(range(16),hourly_precip, 'k', linewidth=11)
+plt.plot(range(16),adjusted_temps, 'r', linewidth=11)
 plt.axis('off')
 plt.ylim((-0.02,1.02))
 plt.savefig('weather.png', bbox_inches="tight")
@@ -72,7 +79,7 @@ temp = '{0:.0f}'.format(currentTemp) + '°'
 # Create a new blank image, img, of type P 
 # that is the width and height of the Inky pHAT display,
 # then create a drawing canvas, draw, to which we can draw text and graphics
-img = Image.new('P', (212, 104))
+img = Image.new('P', (inky_display.WIDTH, inky_display.HEIGHT))
 draw = ImageDraw.Draw(img)
 
 # import the fonts and set sizes
@@ -91,40 +98,41 @@ day_Name = date.strftime(weekday, '%a %-d')
 weekday2 = datetime.date.today() + datetime.timedelta(days=1)
 day2 = date.strftime(weekday2, '%A')
 
-draw.line((117,0,117,200),BLACK,1)
+draw.line((140,0,140,200),BLACK,1)
 
 draw.text((3, 3), day_Name, BLACK, dateFont)
 
 
 # draw the current summary and conditions on the left side of the screen
 # draw.text((3, 60), currentCondFormatted, BLACK, smallFont)
-weather_image.thumbnail((100,120))
+weather_image.thumbnail((120,150))
 weather_image.putpixel((0,0),(255,0,0,255))
 weather_image = weather_image.convert("P", colors=3)
 lut = [0]*256
-lut[1] = 2
-lut[2] = 1
+lut[1] = 1
+lut[2] = 2
 weather_image.putpixel((0,0),0)
 weather_image = weather_image.point(lut)
-img.paste(weather_image, (8,20))
+img.paste(weather_image, (6,20))
+
 for pct in (0,25,50,75,100):
-    st = f'{pct}%'
-    hpos = 111 - 3 * len(st)
-    vpos = int(round(90 - .69 * pct))
+    st = str(pct) + '%'
+    hpos = 131 - 3 * len(st)
+    vpos = int(round(98 - .69*1.1 * pct))
     draw.text((hpos,vpos), st, BLACK, smallestFont)
 for tmp in range(min_temp, max_temp+1,5):
     pct = (tmp - min_temp) / (max_temp - min_temp)
     st = str(tmp)
     hpos = 10 - 3 * len(st)
-    vpos = int(round(90 - 69 * pct))
+    vpos = int(round(98 - 69*1.1 * pct))
     draw.text((hpos,vpos), st, YELLOW, smallestFont)
 # draw.text((97,96),'21',BLACK,smallestFont)
 for idx in range(0,16,3):
     timestamp = hourly_times[idx].hour
     st = str(timestamp)
     pct = idx / 15.
-    hpos = 12 + 84 * pct + 3*(len(st) == 1)
-    vpos = 96
+    hpos = 12 + 104 * pct + 3*(len(st) == 1)
+    vpos = 104
     draw.text((hpos,vpos), st, BLACK, smallFont)
 
 
@@ -134,14 +142,14 @@ draw.text((80, -2), temp, BLACK, tempFont)
 # draw.text((125, 55), day2, BLACK, font)
 # draw.text((125, 66), tempsDay2, BLACK, smallFont)
 # draw.text((125, 77), summary2Formatted, BLACK, smallestFont)
-draw.text((123,0),"Agenda",BLACK,dateFont)
+draw.text((150,0),"Agenda",BLACK,dateFont)
 curr_height = 20
 for time,event in calendar_agenda:
-    newX = 123
+    newX = 143
     width = 17
     if time:
-        draw.text((118 + 5 * (5-len(time)),curr_height),time,YELLOW,smallFont)
-        newX = 146
+        draw.text((138 + 5 * (5-len(time)),curr_height),time,YELLOW,smallFont)
+        newX = 166
         width = 13
     formattedEvent = textwrap.fill(event, width, break_long_words=True,max_lines=2)
     lines = formattedEvent.count('\n') + 1
@@ -152,7 +160,7 @@ for time,event in calendar_agenda:
 icons = {}
 
 # build the dictionary 'icons'
-for icon in glob.glob('weather-icons/icon-*.png'):
+for icon in glob.glob('images/icon-*.png'):
     # format the file name down to the text we need
     # example: 'icon-fog.png' becomes 'fog'
     # and gets put in the libary 
@@ -162,7 +170,6 @@ for icon in glob.glob('weather-icons/icon-*.png'):
     icons[icon_name] = icon_image
 
 # Draw the current weather icon top in top right
-# print(f'Icon is {iconDesc}, icons are {icons}')
 if iconDesc is not None and iconDesc in icons:
     img.paste(icons[iconDesc], (49, 1))        
 else:
@@ -171,9 +178,10 @@ else:
 print("Displaying...")
 img.save("preview.png","PNG")
 # set up the image to push it
-img.show()
+if not pi: img.show()
 if pi:
-    inky_display.set_image(img)
+    data = np.array(img)
+    inky_display.set_image(Image.fromarray((4-data)%3))
 
     # push it all to the screen
     inky_display.show()

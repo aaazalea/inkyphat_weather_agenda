@@ -15,7 +15,7 @@ matplotlib
 numpy
 oauthlib
 Pillow
-pkg-resources
+# pkg-resources
 pyasn1
 pyasn1-modules
 pyparsing
