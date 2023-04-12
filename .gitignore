@@ -6,3 +6,4 @@ token.pickle
 venv/
 weather.png
 preview.png
+local_secrets.py

@@ -12,54 +12,40 @@ if pi:
     from inky import auto
     inky_display = auto()#InkyPHAT("yellow")
 
+import dateutil.parser
 print("Initializing PIL...")
 from PIL import Image, ImageFont, ImageDraw
 import datetime
 from datetime import date, timedelta
-from darksky import forecast
 import textwrap
-print("Initializing matplotlib...")
-from matplotlib import pyplot as plt
 print('init numpy')
 import numpy as np
+print("Initializing matplotlib...")
+from matplotlib import pyplot as plt
 print("Other init...")
 from math import ceil, floor
-import secrets
+import tomorrow
 import calendar_reader
 # set the colour of the phat: black, red or yellow
 BLACK = inky_display.BLACK if pi else (0,0,0)
 YELLOW = inky_display.YELLOW if pi else (200,150,0)
 WIDTH = inky_display.WIDTH if pi else 212
-inky_display.set_border(BLACK)
+HEIGHT = inky_display.HEIGHT if pi else 104
+if pi: inky_display.set_border(BLACK)
 
-# set lat/long for location
-LOCATION = (40.650002, -73.949997) #put your longitude and latittude here in decimal degrees
-UNITS = 'us' #specify the units you want your results in here, see the Dark Sky API docs page for details 
-
-# set Darksky API Key
-APIKEY= secrets.darksky_apikey # put your Dark Sky API key here. Get one at https://darksky.net/dev
 calendar_agenda = calendar_reader.get_events()
-# Get data from DarkSky
-print("Weather forecast...")
-with forecast(APIKEY, *LOCATION, units=UNITS) as location:
-    # print(location)
-    # today
-    currentTemp = location['currently']['temperature']
-    upcoming_conditions = location['minutely']['summary']
-    relativeHumidity = location['currently']['humidity']
-    highTemp = location['daily']['data'][0]['temperatureHigh']
-    lowTemp = location['daily']['data'][0]['temperatureLow']
-    iconDesc = location['currently']['icon']
-  
-    # tomorrow 
-    summary2 = location['daily']['data'][1]['summary']
-    iconDesc2 = location['daily']['data'][1]['icon']
-    highTemp2 = location['daily']['data'][1]['temperatureHigh']
-    lowTemp2 = location['daily']['data'][1]['temperatureLow']
 
-    hourly_times = [datetime.datetime.fromtimestamp(fc.time) for fc in location.hourly.data[:16]]
-    hourly_temps = [fc.temperature for fc in location.hourly.data[:16]]
-    hourly_precip = [fc.precipProbability for fc in location.hourly.data[:16]]
+# Get data from climacell
+print("Weather forecast...")
+future = tomorrow.get_timelines()
+now = tomorrow.get_realtime()
+currentTemp = now['temperature']
+iconDesc = tomorrow.icon_convert(now['weatherCode'])
+
+hourly_times = [dateutil.parser.parse(x['startTime']) for x in future]
+hourly_temps = [x['values']['temperature'] for x in future]
+hourly_precip = [x['values']['precipitationProbability'] for x in future]
+
 print("Drawing...")
 # print(hourly_first_time, hourly_temps, hourly_precip)
 min_temp = 5 * floor(min(hourly_temps) / 5.)
@@ -79,7 +65,7 @@ temp = '{0:.0f}'.format(currentTemp) + '°'
 # Create a new blank image, img, of type P 
 # that is the width and height of the Inky pHAT display,
 # then create a drawing canvas, draw, to which we can draw text and graphics
-img = Image.new('P', (inky_display.WIDTH, inky_display.HEIGHT))
+img = Image.new('P', (WIDTH, HEIGHT))
 draw = ImageDraw.Draw(img)
 
 # import the fonts and set sizes
@@ -125,7 +111,7 @@ for tmp in range(min_temp, max_temp+1,5):
     st = str(tmp)
     hpos = 10 - 3 * len(st)
     vpos = int(round(98 - 69*1.1 * pct))
-    draw.text((hpos,vpos), st, YELLOW, smallestFont)
+    draw.text((hpos,vpos), st, BLACK, smallestFont)
 # draw.text((97,96),'21',BLACK,smallestFont)
 for idx in range(0,16,3):
     timestamp = hourly_times[idx].hour
@@ -178,7 +164,7 @@ else:
 print("Displaying...")
 img.save("preview.png","PNG")
 # set up the image to push it
-if not pi: img.show()
+# if not pi: img.show()
 if pi:
     data = np.array(img)
     inky_display.set_image(Image.fromarray((4-data)%3))
